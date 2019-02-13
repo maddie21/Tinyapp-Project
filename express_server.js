@@ -2,6 +2,15 @@ var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
 
+function generateRandomString(len) {
+    function randomString(length, chars) {
+      var result = '';
+      for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+      return result;
+  }
+    return rString = randomString(len, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+  }
+
 app.set("view engine", "ejs");
 
 var urlDatabase = {
