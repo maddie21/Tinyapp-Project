@@ -23,15 +23,17 @@
           <td>
         <%= urls[key] %>
         <form method="POST" action= <%= `/urls/${key}/delete` %>>
+          <div>
           <button type= 'submit'>Delete</button>
         </form> 
         
-        <a href= '/urls/new'><button>Edit</button></a>
+        <a href= '/urls/new'>Edit</a>
         
           </td>
           <td>
         <a href=<%= `/urls/${key}` %>> <%= key %> </a>    <!-- A link for shortening a new URL -->
         </td>
+      </div>
         <% } %>
         
 
