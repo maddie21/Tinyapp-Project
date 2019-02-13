@@ -16,5 +16,9 @@
     <h6>
         <%= shortURL %> : <%= longURL %>
     </h6>
+    <form method = "POST" action = <%= `/urls/${shortURL}` %>>
+        <button type = 'submit'> Update </button> 
+        <input type = 'text' size = 25px name = 'updateURL' placeholder = <%=longURL%>></input> 
+    </form>
 </body>
 </html>

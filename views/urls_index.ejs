@@ -25,6 +25,9 @@
         <form method="POST" action= <%= `/urls/${key}/delete` %>>
           <button type= 'submit'>Delete</button>
         </form> 
+        
+        <a href= '/urls/new'><button>Edit</button></a>
+        
           </td>
           <td>
         <a href=<%= `/urls/${key}` %>> <%= key %> </a>    <!-- A link for shortening a new URL -->
