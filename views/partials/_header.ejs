@@ -1,18 +1,13 @@
 <h1><a href="/urls">Tiny URL</a></h1>
 
 
-<% if(username) {%>
-    <label>Welcome, <%=username.email%></label>
+<% if(user) {%>
+    <label>Welcome, <%=user.email%></label>
     <form method="post" action="/logout">
         <input type="submit" value="Logout"/>
     </form>
 <% } else {%>
-    <form method="POST" action= '/login' >
-        <label for = "username"><%=username%></label>
-        <br>
-        Please Login:
-        <input type = 'text' name = 'username'></input>
-        <br>
+    <form method="GET" action= '/login' >
         <button type = 'submit'>Login</button>
     </form>
 <% } %>
