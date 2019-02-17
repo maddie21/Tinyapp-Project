@@ -1,4 +1,5 @@
 var express = require("express");
+const bcrypt = require('bcrypt');
 var app = express();
 var PORT = 8080; // default port 8080
 var cookieParser = require("cookie-parser");
@@ -18,18 +19,7 @@ function generateRandomString(len) {
   ));
 }
 
-let users = [
-  {
-    id: "maddie",
-    email: "maddie@example.com",
-    password: "123"
-  },
-  {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
-];
+let users = [];
 
 function checkIfUserExists(email) {
   for (user in users) {
@@ -89,7 +79,7 @@ app.get("/login", (req, res) => {
   if (user) {
     res.redirect("/urls");
   } else {
-    let templateVars = { user: user, error: undefined };
+    let templateVars = { user: false, error: undefined };
     res.render("loginPage", templateVars);
   }
 });
@@ -97,24 +87,21 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
-  console.log(email);
-  console.log(password);
-  // res.cookie('username', req.body.username);
   if (checkIfUserExists(email)) {
     let loggingInUser = getUserByEmail(email);
-    if (loggingInUser.password === password) {
-      //set cookie
+    if(bcrypt.compareSync(password, loggingInUser.password)) {
       res.cookie("user_id", loggingInUser.id);
       res.redirect("/urls");
-      //send the user to /urls
     } else {
       let templateVars = {
+        user: false,
         error: `Password is incorrect`
       };
       res.status(403).render("loginPage", templateVars);
     }
   } else {
     let templateVars = {
+      user: false,
       error: `User with email ${email} not found`
     };
     res.status(403).render("loginPage", templateVars);
@@ -267,7 +254,7 @@ app.post("/register", (req, res) => {
       let newUserObject = {
         id: generateRandomString(6),
         email: req.body.email,
-        password: req.body.password
+        password: bcrypt.hashSync(req.body.password, 10)
       };
       users[newUserObject.id] = newUserObject;
       res.cookie("user_id", newUserObject.id);
