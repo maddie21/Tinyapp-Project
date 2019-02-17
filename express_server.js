@@ -2,9 +2,14 @@ var express = require("express");
 const bcrypt = require('bcrypt');
 var app = express();
 var PORT = 8080; // default port 8080
-var cookieParser = require("cookie-parser");
+var cookieSession = require('cookie-session')
 var app = express();
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  secret: 'maddiecodes',
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 function generateRandomString(len) {
   function randomString(length, chars) {
@@ -72,8 +77,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/login", (req, res) => {
   let user;
-  if (req.cookies) {
-    let user_id = req.cookies["user_id"];
+  if (req.session) {
+    let user_id = req.session.user_id;
     user = getUserByUserId(user_id);
   }
   if (user) {
@@ -90,7 +95,7 @@ app.post("/login", (req, res) => {
   if (checkIfUserExists(email)) {
     let loggingInUser = getUserByEmail(email);
     if(bcrypt.compareSync(password, loggingInUser.password)) {
-      res.cookie("user_id", loggingInUser.id);
+      req.session.user_id = loggingInUser.id;
       res.redirect("/urls");
     } else {
       let templateVars = {
@@ -125,8 +130,8 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let user;
-  if (req.cookies) {
-    let user_id = req.cookies["user_id"];
+  if (req.session) {
+    let user_id = req.session.user_id;
     user = getUserByUserId(user_id);
   }
   let userUrls = {};
@@ -145,8 +150,8 @@ app.get("/register", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let user;
-  if (req.cookies) {
-    let user_id = req.cookies["user_id"];
+  if (req.session) {
+    let user_id = req.session.user_id;
     user = getUserByUserId(user_id);
   }
   if(user) {
@@ -162,8 +167,8 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let user;
-  if (req.cookies) {
-    let user_id = req.cookies["user_id"];
+  if (req.session) {
+    let user_id = req.session.user_id;
     user = getUserByUserId(user_id);
   }
   let templateVars = {
@@ -180,8 +185,8 @@ app.get("/hello", (req, res) => {
 
 app.post("/urls", (req, res) => {
   let user;
-  if (req.cookies) {
-    let user_id = req.cookies["user_id"];
+  if (req.session) {
+    let user_id = req.session.user_id;
     user = getUserByUserId(user_id);
   }
   let shortUrl = generateRandomString(6);
@@ -192,8 +197,8 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:shortURL", (req, res) => {
   let user;
-  if (req.cookies) {
-    let user_id = req.cookies["user_id"];
+  if (req.session) {
+    let user_id = req.session.user_id;
     user = getUserByUserId(user_id);
   }
   if(user) {
@@ -210,8 +215,8 @@ app.post("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if (req.cookies) {
-    let user_id = req.cookies["user_id"];
+  if (req.session) {
+    let user_id = req.session.user_id;
     user = getUserByUserId(user_id);
   }
   if(user) {
@@ -228,7 +233,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/urls");
 });
 
@@ -257,7 +262,7 @@ app.post("/register", (req, res) => {
         password: bcrypt.hashSync(req.body.password, 10)
       };
       users[newUserObject.id] = newUserObject;
-      res.cookie("user_id", newUserObject.id);
+      req.session.user_id = newUserObject.id;
       res.redirect("/urls");
     }
   }
